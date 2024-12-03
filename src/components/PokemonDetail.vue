@@ -13,7 +13,7 @@
         <button @click="$emit('close')" class="text-gray-400 hover:text-white">×</button>
       </div>
 
-      <img :src="pokemon.image" :alt="pokemon.name" class="w-48 h-48 mx-auto mb-4" />
+      <img :src="pokemon.detailImage" :alt="pokemon.name" class="w-48 h-48 mx-auto mb-4" />
 
       <div class="grid gap-4">
         <div>
@@ -28,17 +28,6 @@
               <img :src="type.image" :alt="type.name" class="w-5 h-5" />
               {{ type.name }}
             </div>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <p class="font-bold">Taille</p>
-            <p>{{ pokemon.height }} m</p>
-          </div>
-          <div>
-            <p class="font-bold">Poids</p>
-            <p>{{ pokemon.weight }} kg</p>
           </div>
         </div>
 

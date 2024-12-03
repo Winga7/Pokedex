@@ -32,21 +32,21 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 mb-4">
+    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 mb-4">
       <div
-        class="bg-gray-700 rounded-lg p-3 text-center cursor-pointer hover:bg-gray-600 transition-colors flex flex-col items-center aspect-square"
+        class="bg-gray-700 rounded-lg p-1 text-center cursor-pointer hover:bg-gray-600 transition-colors flex flex-col items-center aspect-square"
         v-for="pokemon in paginatedAndFilteredPokemons"
         :key="pokemon.id"
         @click="selectedPokemon = pokemon"
       >
-        <div class="flex-1 flex items-center justify-center w-full">
+        <div class="flex-1 flex items-center justify-center w-full p-0.5">
           <img
             :src="pokemon.image"
             :alt="pokemon.name"
-            class="max-w-full max-h-full object-contain"
+            class="w-24 h-24 sm:w-28 sm:h-28 object-contain"
           />
         </div>
-        <h2 class="text-base mt-2">{{ pokemon.name }}</h2>
+        <h2 class="text-xs mt-0.5 truncate w-full px-1">{{ pokemon.name }}</h2>
       </div>
     </div>
 
@@ -89,7 +89,7 @@ const selectedPokemon = ref(null);
 const searchQuery = ref('');
 const selectedTypes = ref([]);
 const currentPage = ref(1);
-const itemsPerPage = 12;
+const itemsPerPage = 40;
 
 const uniqueTypes = computed(() => {
   const typesMap = new Map();

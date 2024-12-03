@@ -10,6 +10,7 @@ export const getPokemons = async () => {
     id: pokemon.id,
     name: pokemon.name,
     image: pokemon.sprite,
+    detailImage: pokemon.image,
     types: pokemon.apiTypes,
     stats: {
       HP: pokemon.stats.HP,
