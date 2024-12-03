@@ -30,6 +30,25 @@
           </label>
         </div>
       </div>
+
+      <div class="bg-gray-700 p-4 rounded-lg">
+        <h3 class="font-bold mb-2">Filtrer par génération</h3>
+        <div class="flex flex-wrap gap-2">
+          <label
+            v-for="generation in uniqueGenerations"
+            :key="generation.id"
+            class="flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer"
+          >
+            <input
+              type="checkbox"
+              :value="generation.id"
+              v-model="selectedGenerations"
+              class="rounded"
+            />
+            <span>{{ generation.name }} ({{ generation.count }})</span>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 mb-4">
@@ -88,6 +107,7 @@ const pokemons = ref([]);
 const selectedPokemon = ref(null);
 const searchQuery = ref('');
 const selectedTypes = ref([]);
+const selectedGenerations = ref([]);
 const currentPage = ref(1);
 const itemsPerPage = 40;
 
@@ -103,13 +123,28 @@ const uniqueTypes = computed(() => {
   return Array.from(typesMap.values());
 });
 
+// Créer une liste des générations avec leur compte
+const uniqueGenerations = computed(() => {
+  const generationsMap = new Map();
+  pokemons.value.forEach(pokemon => {
+    if (!generationsMap.has(pokemon.generation)) {
+      generationsMap.set(pokemon.generation, { id: pokemon.generation, name: pokemon.generation, count: 1 });
+    } else {
+      generationsMap.get(pokemon.generation).count++;
+    }
+  });
+  return Array.from(generationsMap.values());
+});
+
 const filteredPokemons = computed(() => {
   return pokemons.value.filter(pokemon => {
     const matchesSearch = pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
                          pokemon.id.toString().includes(searchQuery.value);
     const matchesTypes = selectedTypes.value.length === 0 ||
                         pokemon.types.some(type => selectedTypes.value.includes(type.name));
-    return matchesSearch && matchesTypes;
+    const matchesGenerations = selectedGenerations.value.length === 0 ||
+                               selectedGenerations.value.includes(pokemon.generation);
+    return matchesSearch && matchesTypes && matchesGenerations;
   });
 });
 
@@ -125,7 +160,7 @@ const paginatedAndFilteredPokemons = computed(() => {
 });
 
 // Réinitialiser la page quand les filtres changent
-watch([searchQuery, selectedTypes], () => {
+watch([searchQuery, selectedTypes, selectedGenerations], () => {
   currentPage.value = 1;
 });
 
@@ -136,4 +171,6 @@ onMounted(async () => {
     console.error('Erreur:', error);
   }
 });
+
+console.log(uniqueGenerations.value);
 </script>

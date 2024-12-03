@@ -10,10 +10,19 @@
     >
       <div class="flex justify-between items-start mb-4">
         <h2 class="text-2xl font-bold">✨ {{ pokemon.name }} ✨</h2>
-        <button @click="$emit('close')" class="text-gray-400 hover:text-white text-2xl">×</button>
+        <button
+          @click="$emit('close')"
+          class="text-gray-400 hover:text-white text-2xl"
+        >
+          ×
+        </button>
       </div>
 
-      <img :src="pokemon.detailImage" :alt="pokemon.name" class="w-48 h-48 mx-auto mb-4" />
+      <img
+        :src="pokemon.detailImage"
+        :alt="pokemon.name"
+        class="w-48 h-48 mx-auto mb-4"
+      />
 
       <div class="grid gap-6">
         <!-- ID et Types -->
@@ -87,13 +96,17 @@
               :key="resistance.name"
               class="flex items-center gap-2 px-3 py-2 bg-gray-700 rounded-lg"
             >
-              <img :src="resistance.image" :alt="resistance.name" class="w-5 h-5" />
+              <img
+                :src="resistance.image"
+                :alt="resistance.name"
+                class="w-5 h-5"
+              />
               <span class="flex-1">{{ resistance.name }}</span>
               <span
                 :class="{
                   'text-green-400': resistance.damage_multiplier < 1,
                   'text-red-400': resistance.damage_multiplier > 1,
-                  'text-gray-400': resistance.damage_multiplier === 1
+                  'text-gray-400': resistance.damage_multiplier === 1,
                 }"
               >
                 ×{{ resistance.damage_multiplier }}
@@ -106,7 +119,11 @@
         <div>
           <p class="font-bold mb-2">📊 Statistiques</p>
           <div class="grid gap-2">
-            <div v-for="(value, stat) in pokemon.stats" :key="stat" class="flex justify-between">
+            <div
+              v-for="(value, stat) in pokemon.stats"
+              :key="stat"
+              class="flex justify-between"
+            >
               <span class="capitalize">{{ formatStatName(stat) }}:</span>
               <div class="flex items-center gap-2">
                 <div class="w-32 h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -115,7 +132,7 @@
                     :class="{
                       'bg-green-500': value >= 100,
                       'bg-blue-500': value < 100 && value >= 50,
-                      'bg-red-500': value < 50
+                      'bg-red-500': value < 50,
                     }"
                     :style="{ width: `${(value / 255) * 100}%` }"
                   ></div>

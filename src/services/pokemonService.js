@@ -20,7 +20,7 @@ export const getPokemons = async () => {
       special_defense: pokemon.stats.special_defense,
       speed: pokemon.stats.speed,
     },
-    generation: pokemon.generation,
+    generation: pokemon.apiGeneration, // Utilisez apiGeneration ici
     abilities: pokemon.abilities,
     resistances: pokemon.apiResistances,
     evolution: pokemon.apiEvolutions || [],
