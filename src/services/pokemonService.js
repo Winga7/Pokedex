@@ -20,7 +20,9 @@ export const getPokemons = async () => {
       special_defense: pokemon.stats.special_defense,
       speed: pokemon.stats.speed,
     },
-    height: pokemon.height / 10,
-    weight: pokemon.weight / 10,
+    generation: pokemon.generation,
+    abilities: pokemon.abilities,
+    resistances: pokemon.apiResistances,
+    evolution: pokemon.apiEvolutions || [],
   }));
 };
