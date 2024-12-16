@@ -1,176 +1,48 @@
 <template>
-  <div class="p-4 bg-gray-800 text-white rounded-lg">
-    <h1 class="text-2xl font-bold text-center mb-4">🌟 Liste des Pokémon 🌟</h1>
-
-    <div class="flex flex-col gap-4 mb-4">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Rechercher par nom ou ID..."
-        class="bg-gray-700 text-white px-4 py-2 rounded-lg"
-      />
-
-      <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="font-bold mb-2">Filtrer par type</h3>
-        <div class="flex flex-wrap gap-2">
-          <label
-            v-for="type in uniqueTypes"
-            :key="type.name"
-            class="flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer"
-            :style="{ backgroundColor: type.color }"
-          >
-            <input
-              type="checkbox"
-              :value="type.name"
-              v-model="selectedTypes"
-              class="rounded"
-            />
-            <img :src="type.image" :alt="type.name" class="w-5 h-5" />
-            <span>{{ type.name }}</span>
-          </label>
-        </div>
-      </div>
-
-      <div class="bg-gray-700 p-4 rounded-lg">
-        <h3 class="font-bold mb-2">Filtrer par génération</h3>
-        <div class="flex flex-wrap gap-2">
-          <label
-            v-for="generation in uniqueGenerations"
-            :key="generation.id"
-            class="flex items-center gap-2 px-3 py-1 rounded-full cursor-pointer"
-          >
-            <input
-              type="checkbox"
-              :value="generation.id"
-              v-model="selectedGenerations"
-              class="rounded"
-            />
-            <span>{{ generation.name }} ({{ generation.count }})</span>
-          </label>
-        </div>
-      </div>
+  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 p-4">
+    <div
+      v-for="pokemon in pokemons"
+      :key="pokemon.id"
+      class="card bg-gray-800 text-white p-4 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300"
+      @click="selectPokemon(pokemon)"
+    >
+      <h2 class="text-lg font-bold text-center mb-2">{{ pokemon.name.fr }}</h2>
+      <img :src="pokemon.sprites.regular" alt="Sprite" class="pokemon-sprite w-24 h-24 mx-auto rounded-full border-2 border-pink-500" />
     </div>
-
-    <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 gap-2 mb-4">
-      <div
-        class="bg-gray-700 rounded-lg p-1 text-center cursor-pointer hover:bg-gray-600 transition-colors flex flex-col items-center aspect-square"
-        v-for="pokemon in paginatedAndFilteredPokemons"
-        :key="pokemon.id"
-        @click="selectedPokemon = pokemon"
-      >
-        <div class="flex-1 flex items-center justify-center w-full p-0.5">
-          <img
-            :src="pokemon.image"
-            :alt="pokemon.name"
-            class="w-24 h-24 sm:w-28 sm:h-28 object-contain"
-          />
-        </div>
-        <h2 class="text-xs mt-0.5 truncate w-full px-1">{{ pokemon.name }}</h2>
-      </div>
-    </div>
-
-    <!-- Pagination -->
-    <div class="flex justify-center gap-2 mt-4">
-      <button
-        @click="currentPage--"
-        :disabled="currentPage === 1"
-        class="px-4 py-2 bg-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-600"
-      >
-        Précédent
-      </button>
-      <span class="px-4 py-2 bg-gray-700 rounded-lg">
-        Page {{ currentPage }} sur {{ totalPages }}
-      </span>
-      <button
-        @click="currentPage++"
-        :disabled="currentPage === totalPages"
-        class="px-4 py-2 bg-gray-700 rounded-lg disabled:opacity-50 hover:bg-gray-600"
-      >
-        Suivant
-      </button>
-    </div>
-
-    <PokemonDetail
-      v-if="selectedPokemon"
-      :pokemon="selectedPokemon"
-      @close="selectedPokemon = null"
-    />
   </div>
+  <PokemonDetail v-if="selectedPokemon" :pokemon="selectedPokemon" @close="selectedPokemon = null" />
 </template>
 
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { getPokemons } from '../services/pokemonService';
 import PokemonDetail from './PokemonDetail.vue';
 
 const pokemons = ref([]);
 const selectedPokemon = ref(null);
-const searchQuery = ref('');
-const selectedTypes = ref([]);
-const selectedGenerations = ref([]);
-const currentPage = ref(1);
-const itemsPerPage = 40;
-
-const uniqueTypes = computed(() => {
-  const typesMap = new Map();
-  pokemons.value.forEach(pokemon => {
-    pokemon.types.forEach(type => {
-      if (!typesMap.has(type.name)) {
-        typesMap.set(type.name, type);
-      }
-    });
-  });
-  return Array.from(typesMap.values());
-});
-
-// Créer une liste des générations avec leur compte
-const uniqueGenerations = computed(() => {
-  const generationsMap = new Map();
-  pokemons.value.forEach(pokemon => {
-    if (!generationsMap.has(pokemon.generation)) {
-      generationsMap.set(pokemon.generation, { id: pokemon.generation, name: pokemon.generation, count: 1 });
-    } else {
-      generationsMap.get(pokemon.generation).count++;
-    }
-  });
-  return Array.from(generationsMap.values());
-});
-
-const filteredPokemons = computed(() => {
-  return pokemons.value.filter(pokemon => {
-    const matchesSearch = pokemon.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-                         pokemon.id.toString().includes(searchQuery.value);
-    const matchesTypes = selectedTypes.value.length === 0 ||
-                        pokemon.types.some(type => selectedTypes.value.includes(type.name));
-    const matchesGenerations = selectedGenerations.value.length === 0 ||
-                               selectedGenerations.value.includes(pokemon.generation);
-    return matchesSearch && matchesTypes && matchesGenerations;
-  });
-});
-
-const totalPages = computed(() => {
-  return Math.ceil(filteredPokemons.value.length / itemsPerPage);
-});
-
-// Obtenir les Pokémon pour la page actuelle
-const paginatedAndFilteredPokemons = computed(() => {
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return filteredPokemons.value.slice(start, end);
-});
-
-// Réinitialiser la page quand les filtres changent
-watch([searchQuery, selectedTypes, selectedGenerations], () => {
-  currentPage.value = 1;
-});
 
 onMounted(async () => {
-  try {
-    pokemons.value = await getPokemons();
-  } catch (error) {
-    console.error('Erreur:', error);
-  }
+  pokemons.value = await getPokemons();
 });
 
-console.log(uniqueGenerations.value);
+const selectPokemon = (pokemon) => {
+  selectedPokemon.value = pokemon;
+};
 </script>
+
+<style scoped>
+.card {
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s;
+  border: 1px solid #444;
+  background-color: #2d2d2d;
+}
+.card:hover {
+  transform: scale(1.05);
+}
+.pokemon-sprite {
+  max-width: 100%;
+  height: auto;
+}
+</style>
